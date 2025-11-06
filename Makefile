@@ -1,7 +1,7 @@
 PYTHON ?= python3
 PIP ?= pip3
 
-.PHONY: install run serve lint
+.PHONY: install run serve lint test
 
 install:
 	@echo "Installing dependencies..."
@@ -16,3 +16,7 @@ run:
 # Run FastAPI development server
 serve:
 	.venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Run tests
+test:
+	.venv/bin/pytest tests/ -v
