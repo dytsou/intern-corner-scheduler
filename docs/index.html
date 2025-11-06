@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Round-Table Scheduler</title>
+	<link rel="stylesheet" href="css/style.css">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Round-Table Scheduler</h1>
+			<p class="subtitle">Generate optimal seating arrangements with constraints</p>
+		</header>
+
+		<div class="main-content">
+			<!-- Input Form -->
+			<section class="card" id="input-section">
+				<h2>Schedule Parameters</h2>
+				<form id="schedule-form">
+					<div class="form-group">
+						<label for="participants">Number of Participants</label>
+						<input type="number" id="participants" name="participants" min="1" required>
+						<small>Total number of participants (1..a)</small>
+					</div>
+
+					<div class="form-group">
+						<label for="tables">Number of Tables</label>
+						<input type="number" id="tables" name="tables" min="1" required>
+						<small>Number of tables (1..b). Participants 1..b will be hosts.</small>
+					</div>
+
+					<div class="form-group">
+						<label for="rounds">Number of Rounds</label>
+						<input type="number" id="rounds" name="rounds" min="1" required>
+						<small>Number of rounds to schedule</small>
+					</div>
+
+					<div class="form-group">
+						<label for="time-limit">Time Limit (seconds)</label>
+						<input type="number" id="time-limit" name="time-limit" min="1" max="300" value="60">
+						<small>Maximum time for the solver (1-300 seconds)</small>
+					</div>
+
+					<!-- Same-Once Pairs -->
+					<div class="form-group">
+						<div class="pairs-header">
+							<label>Same-Once Pairs</label>
+							<button type="button" class="btn-secondary" id="add-same-once">+ Add Pair</button>
+						</div>
+						<small>Pairs that should be seated together exactly once</small>
+						<div id="same-once-pairs" class="pairs-container"></div>
+					</div>
+
+					<!-- Never-Together Pairs -->
+					<div class="form-group">
+						<div class="pairs-header">
+							<label>Never-Together Pairs</label>
+							<button type="button" class="btn-secondary" id="add-never-together">+ Add Pair</button>
+						</div>
+						<small>Pairs that must never be seated together</small>
+						<div id="never-together-pairs" class="pairs-container"></div>
+					</div>
+
+					<button type="submit" class="btn-primary" id="submit-btn">
+						<span class="btn-text">Generate Schedule</span>
+						<span class="btn-loading" style="display: none;">Generating...</span>
+					</button>
+				</form>
+			</section>
+
+			<!-- Results Section -->
+			<section class="card" id="results-section" style="display: none;">
+				<h2>Schedule Results</h2>
+				
+				<!-- Statistics Dashboard -->
+				<div id="statistics" class="statistics-grid"></div>
+
+				<!-- Round Selector -->
+				<div id="round-selector" class="round-selector"></div>
+
+				<!-- Table Assignments -->
+				<div id="assignments-container"></div>
+
+				<!-- Pair Status -->
+				<div id="pair-status-container"></div>
+
+				<button type="button" class="btn-secondary" id="reset-btn">Create New Schedule</button>
+			</section>
+
+			<!-- Error Display -->
+			<div id="error-message" class="error-message" style="display: none;"></div>
+		</div>
+	</div>
+
+	<script src="config.js"></script>
+	<script src="js/app.js"></script>
+</body>
+</html>
+
