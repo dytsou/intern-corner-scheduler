@@ -1,0 +1,80 @@
+# Configuration for Dependabot version updates
+# See: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Enable version updates for Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "dytsou"
+    assignees:
+      - "dytsou"
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    # Automatically merge patch and minor updates when CI passes
+    pull-request-branch-name:
+      separator: "/"
+    # Enable security updates
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    ignore:
+      # Add any dependencies you want to ignore here
+      # - dependency-name: "package-name"
+
+  # Enable version updates for npm/pnpm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "dytsou"
+    assignees:
+      - "dytsou"
+    labels:
+      - "dependencies"
+      - "javascript"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    # Automatically merge patch and minor updates when CI passes
+    pull-request-branch-name:
+      separator: "/"
+    # Enable security updates
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    ignore:
+      # Add any dependencies you want to ignore here
+      # - dependency-name: "package-name"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "dytsou"
+    assignees:
+      - "dytsou"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore(ci)"
+      include: "scope"
+
