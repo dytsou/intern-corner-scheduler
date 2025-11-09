@@ -67,3 +67,10 @@ wheels/
 
 # Environment variables
 .env
+
+# Flake8
+.flake8
+flake8.log
+
+# pytest
+.pytest_cache/

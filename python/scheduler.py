@@ -168,8 +168,14 @@ def schedule(
     beta = 1
     gamma = 5
     model.Maximize(
-        alpha * sum(meet[(i, r)] for i in range(len(same_once_pairs)) for r in range(num_rounds))
-        + beta * sum(visited_any[(p, h)] for p in range(num_tables + 1, num_participants + 1) for h in range(1, num_tables + 1))
+        alpha * sum(
+            meet[(i, r)] for i in range(len(same_once_pairs)) for r in range(num_rounds)
+        )
+        + beta * sum(
+            visited_any[(p, h)]
+            for p in range(num_tables + 1, num_participants + 1)
+            for h in range(1, num_tables + 1)
+        )
         + gamma * sum(distinct_pair_host[(p, h)] for (p, h) in distinct_pair_host)
     )
 
@@ -221,8 +227,14 @@ def schedule(
         if viol:
             never_violations.append([u, v])
 
-    status_str = solver.StatusName(status) if hasattr(solver, "StatusName") else str(status)
-    objective_value = int(solver.ObjectiveValue()) if status in (cp_model.OPTIMAL, cp_model.FEASIBLE) else 0
+    status_str = (
+        solver.StatusName(status) if hasattr(solver, "StatusName") else str(status)
+    )
+    objective_value = (
+        int(solver.ObjectiveValue())
+        if status in (cp_model.OPTIMAL, cp_model.FEASIBLE)
+        else 0
+    )
 
     return {
         "participants": num_participants,

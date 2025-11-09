@@ -4,11 +4,11 @@ import os
 # Add parent directory to path to import scheduler from python package
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from typing import List, Optional
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field, field_validator
-from dotenv import load_dotenv
-from python.scheduler import schedule
+from typing import List, Optional  # noqa: E402
+from fastapi import APIRouter, HTTPException  # noqa: E402
+from pydantic import BaseModel, Field, field_validator  # noqa: E402
+from dotenv import load_dotenv  # noqa: E402
+from python.scheduler import schedule  # noqa: E402
 
 # Load environment variables
 load_dotenv()
@@ -27,16 +27,24 @@ class ScheduleRequest(BaseModel):
     participants: int = Field(..., ge=1, description="Number of participants (1..a)")
     tables: int = Field(..., ge=1, description="Number of tables (1..b)")
     rounds: int = Field(..., ge=1, description="Number of rounds")
-    same_once_pairs: List[PairInput] = Field(default_factory=list, description="Pairs that should meet exactly once")
-    never_together_pairs: List[PairInput] = Field(default_factory=list, description="Pairs that must never be together")
-    time_limit_seconds: Optional[int] = Field(default=None, ge=1, le=300, description="Solver time limit in seconds")
+    same_once_pairs: List[PairInput] = Field(
+        default_factory=list, description="Pairs that should meet exactly once"
+    )
+    never_together_pairs: List[PairInput] = Field(
+        default_factory=list, description="Pairs that must never be together"
+    )
+    time_limit_seconds: Optional[int] = Field(
+        default=None, ge=1, le=300, description="Solver time limit in seconds"
+    )
 
     @field_validator('tables')
     @classmethod
     def validate_tables(cls, v, info):
         participants = info.data.get('participants')
         if participants and v > participants:
-            raise ValueError(f"Number of tables ({v}) cannot exceed number of participants ({participants})")
+            raise ValueError(
+                f"Number of tables ({v}) cannot exceed number of participants ({participants})"
+            )
         return v
 
 

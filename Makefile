@@ -39,4 +39,16 @@ build:
 
 # Run tests
 test:
-	.venv/bin/pytest tests/ -v
+	PYTHONPATH=. .venv/bin/pytest tests/ -v
+
+# Lint Python code
+lint: lint-python
+
+lint-python:
+	@echo "Linting Python code..."
+	.venv/bin/flake8 app/ tests/ python/ --count --select=E9,F63,F7,F82 --show-source --statistics
+
+# Lint frontend code (JavaScript/React)
+lint-frontend:
+	@echo "Linting frontend code..."
+	$(PNPM) run lint
