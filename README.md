@@ -88,12 +88,6 @@ A modern React + Vite web interface is available for easier use. The frontend is
    - Edit `src/config.js` and set `BACKEND_URL` to your backend address
    - For production builds, update the URL before running `make build`
 
-### Deployment
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions:
-- Frontend: GitHub Pages
-- Backend: Docker on Ubuntu workstation
-
 ## API Documentation
 
 The FastAPI backend provides a REST API for scheduling. When the server is running, interactive API documentation is available at:
