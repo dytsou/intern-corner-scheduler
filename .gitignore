@@ -68,6 +68,9 @@ wheels/
 # Environment variables
 .env
 
+# pytest.ini
+pytest.ini
+
 # Flake8
 .flake8
 flake8.log
