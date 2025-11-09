@@ -156,4 +156,8 @@ Returns the health status of the API.
 - Non-hosts do not sit at the same table in consecutive rounds.
 - Objective maximizes how many same-once pairs are met exactly once; never-together is enforced strictly.
 
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 

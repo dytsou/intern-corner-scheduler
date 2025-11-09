@@ -444,3 +444,27 @@ header h1 {
 	margin: 1rem 0;
 }
 
+/* Footer */
+footer {
+	margin-top: 3rem;
+	padding: 2rem 0;
+	text-align: center;
+	color: var(--text-secondary);
+	font-size: 0.9rem;
+	border-top: 1px solid var(--border-color);
+}
+
+footer p {
+	margin: 0.5rem 0;
+}
+
+footer a {
+	color: var(--primary-color);
+	text-decoration: none;
+	transition: var(--transition);
+}
+
+footer a:hover {
+	text-decoration: underline;
+}
+
