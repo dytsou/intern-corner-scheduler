@@ -1,0 +1,27 @@
+{
+  "name": "intern-corner-scheduler",
+  "version": "1.0.0",
+  "type": "module",
+  "packageManager": "pnpm@10.20.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/create-nojekyll.js",
+    "preview": "vite preview",
+    "lint": "eslint . --ext js,jsx --ignore-pattern 'docs/**' --report-unused-disable-directives --max-warnings 0"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.26",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "vite": "^5.4.21"
+  }
+}
+

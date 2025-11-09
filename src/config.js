@@ -1,6 +1,6 @@
 // API Configuration
 // Override this in your deployment or set via environment
-const API_CONFIG = {
+export const API_CONFIG = {
 	// Default backend URL - update this to point to your backend
 	// For local development: "http://localhost:8000"
 	// For production: "http://your-ubuntu-workstation-ip:8000" or your domain
@@ -17,9 +17,4 @@ const API_CONFIG = {
 	// Timeout for API calls (milliseconds)
 	TIMEOUT: 120000, // 2 minutes for solver
 };
-
-// Export for use in other scripts
-if (typeof module !== 'undefined' && module.exports) {
-	module.exports = API_CONFIG;
-}
 

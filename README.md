@@ -50,7 +50,7 @@ cd python && python3 main.py < input.txt
 
 ## Web Interface
 
-A modern web interface is available for easier use. The frontend is deployed to GitHub Pages, and the backend runs in Docker on an Ubuntu workstation.
+A modern React + Vite web interface is available for easier use. The frontend is built with React and deployed to GitHub Pages, and the backend runs in Docker on an Ubuntu workstation.
 
 ### Quick Start (Local Development)
 
@@ -58,6 +58,13 @@ A modern web interface is available for easier use. The frontend is deployed to 
    ```bash
    make install
    ```
+   This will install both Python backend dependencies and Node.js frontend dependencies.
+   
+   **Note**: This project uses [pnpm](https://pnpm.io/) as the package manager. If you don't have pnpm installed, you can install it with:
+   ```bash
+   npm install -g pnpm
+   ```
+   Or follow the [pnpm installation guide](https://pnpm.io/installation).
 
 2. **Configure environment variables (optional):**
    ```bash
@@ -67,20 +74,19 @@ A modern web interface is available for easier use. The frontend is deployed to 
 
 3. **Start the backend server:**
    ```bash
-   make serve
+   make serve-backend
    ```
    The API will be available at `http://localhost:8000` (or the port specified in `.env`)
 
-4. **Open the frontend:**
-   - Open `docs/index.html` in your browser
-   - Or serve it with a simple HTTP server:
-     ```bash
-     cd docs && python3 -m http.server 3000
-     ```
-   - Then visit `http://localhost:3000`
+4. **Start the frontend development server:**
+   ```bash
+   make serve-frontend
+   ```
+   The frontend will be available at `http://localhost:5173` and will automatically reload on changes.
 
 5. **Update backend URL (if needed):**
-   - Edit `docs/config.js` and set `BACKEND_URL` to your backend address
+   - Edit `src/config.js` and set `BACKEND_URL` to your backend address
+   - For production builds, update the URL before running `make build`
 
 ### Deployment
 
