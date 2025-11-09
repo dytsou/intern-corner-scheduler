@@ -17,7 +17,6 @@ updates:
       - "dytsou"
     labels:
       - "dependencies"
-      - "python"
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
@@ -46,7 +45,6 @@ updates:
       - "dytsou"
     labels:
       - "dependencies"
-      - "javascript"
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
@@ -73,7 +71,6 @@ updates:
       - "dytsou"
     labels:
       - "dependencies"
-      - "github-actions"
     commit-message:
       prefix: "chore(ci)"
       include: "scope"
