@@ -6,8 +6,12 @@ on:
       - main
     paths:
       - 'package.json'
+      - 'pnpm-lock.yaml'
       - 'vite.config.js'
       - 'index.html'
+      - 'scripts/**'
+      - 'src/**'
+      - '.npmrc'
   release:
     types: [created]
   workflow_dispatch:
