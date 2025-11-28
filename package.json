@@ -30,7 +30,8 @@
     "dev": "vite",
     "build": "vite build && node scripts/create-nojekyll.js",
     "preview": "vite preview",
-    "lint": "eslint . --ext js,jsx --ignore-pattern 'docs/**' --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext js,jsx --ignore-pattern 'docs/**' --report-unused-disable-directives --max-warnings 0",
+    "publish:npmjs": "npm publish --access public --registry https://registry.npmjs.org"
   },
   "dependencies": {
     "react": "^19.2.0",
