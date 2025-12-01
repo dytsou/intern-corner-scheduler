@@ -1,6 +1,6 @@
 {
   "name": "@dytsou/intern-corner-scheduler",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "type": "module",
   "description": "Round-table Scheduler (CP-SAT) - Python CLI and web interface using OR-Tools CP-SAT to generate round-table seating across rounds with fixed hosts, balanced tables, and pair-wise constraints",
   "author": "dytsou",
