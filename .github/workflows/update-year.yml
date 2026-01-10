@@ -1,0 +1,60 @@
+name: Update Copyright Year
+
+on:
+  schedule:
+    # Run on January 1st at 00:00 UTC every year
+    - cron: '0 0 1 1 *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  update-year:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+
+      - name: Get current year
+        id: year
+        run: |
+          YEAR=$(date +%Y)
+          echo "year=$YEAR" >> $GITHUB_OUTPUT
+          echo "Current year: $YEAR"
+
+      - name: Update LICENSE file
+        run: |
+          YEAR="${{ steps.year.outputs.year }}"
+          sed -i "s/Copyright (c) [0-9]\{4\}/Copyright (c) $YEAR/" LICENSE
+          echo "Updated LICENSE file"
+
+      - name: Update Footer component
+        run: |
+          YEAR="${{ steps.year.outputs.year }}"
+          # Match "&copy; YYYY" pattern and replace the year
+          sed -i "s/\(Round-Table Scheduler &copy; \)[0-9]\{4\}/\1$YEAR/" src/components/Footer.jsx
+          echo "Updated Footer.jsx file"
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes detected"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changes detected"
+            git diff
+          fi
+
+      - name: Commit and push changes
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add LICENSE src/components/Footer.jsx
+          git commit -m "chore: update copyright year to ${{ steps.year.outputs.year }}"
+          git push
