@@ -1,7 +1,7 @@
 function Footer() {
 	return (
 		<footer>
-			<p>Round-Table Scheduler &copy; 2025 by{' '}
+			<p>Round-Table Scheduler &copy; 2026 by{' '}
 				<a href="https://github.com/dytsou" target="_blank" rel="noopener noreferrer">dytsou</a>
 			</p>
 			<p>Licensed under the{' '}
