@@ -5,4 +5,3 @@ import { join } from 'path';
 const nojekyllPath = join(process.cwd(), 'docs', '.nojekyll');
 writeFileSync(nojekyllPath, '');
 console.log('Created .nojekyll file in docs/');
-
