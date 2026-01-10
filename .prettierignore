@@ -1,0 +1,29 @@
+# Dependencies
+node_modules
+dist
+dist-ssr
+docs
+
+# Build outputs
+*.local
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Python
+*.py
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+
+# Git
+.git/
