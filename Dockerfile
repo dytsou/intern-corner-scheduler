@@ -19,6 +19,11 @@ COPY app/ ./app/
 # Copy environment file (optional - can be overridden with docker-compose)
 COPY .env.example .env
 
+# Run as a non-root user
+RUN useradd --create-home --uid 10001 appuser \
+  && chown -R appuser:appuser /app
+USER appuser
+
 # Expose port
 EXPOSE 8000
 
