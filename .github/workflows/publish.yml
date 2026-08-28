@@ -94,8 +94,11 @@ jobs:
         id: publish-npmjs
         run: |
           PACKAGE_NAME="${{ steps.package-name.outputs.name }}"
+          SCOPE="${{ steps.package-name.outputs.scope }}"
+          npm config set ${SCOPE}:registry https://registry.npmjs.org
           npm config set registry https://registry.npmjs.org
-          npm publish --access public || {
+          npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
+          npm publish --access public --registry=https://registry.npmjs.org || {
             if npm view $PACKAGE_NAME@${{ steps.package-version.outputs.version }} version --registry=https://registry.npmjs.org >/dev/null 2>&1; then
               echo "Version already exists, skipping publish"
               exit 0
