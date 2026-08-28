@@ -2,7 +2,7 @@ PYTHON ?= python3
 PIP ?= pip3
 PNPM ?= pnpm
 
-.PHONY: install install-frontend install-backend run serve serve-frontend serve-backend build lint test
+.PHONY: install install-frontend install-backend run run-cli run-down serve serve-frontend serve-backend build lint test
 
 # Install all dependencies (Python backend + Node.js frontend)
 install: install-backend install-frontend
@@ -19,8 +19,16 @@ install-frontend:
 	@echo "Installing Node.js dependencies..."
 	$(PNPM) install
 
-# Usage: make run < input.txt
+# Start frontend + backend together via Docker (builds images, runs in background)
 run:
+	docker compose up --build -d
+
+# Stop the Docker containers started by `make run`
+run-down:
+	docker compose down
+
+# Run the Python CLI (usage: make run-cli < input.txt)
+run-cli:
 	cd python && ../.venv/bin/python main.py
 
 # Run FastAPI development server (backend)

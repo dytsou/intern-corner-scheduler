@@ -18,3 +18,13 @@ services:
       retries: 3
       start_period: 40s
 
+  scheduler-web:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: scheduler-web
+    ports:
+      - "${WEB_PORT:-5173}:80"
+    depends_on:
+      - scheduler-api
+    restart: unless-stopped

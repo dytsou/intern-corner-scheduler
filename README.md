@@ -31,10 +31,20 @@ make install
 ```
 
 ## Run
+
+### Web interface (frontend + backend via Docker)
+```bash
+make run          # builds and starts both the API and the web UI in Docker
+                  # web UI:  http://localhost:${WEB_PORT:-5173}
+                  # API:     http://localhost:${API_PORT:-8000}
+make run-down     # stop the Docker containers
+```
+
+### CLI
 Pipe input into the program:
 ```bash
 # example
-cat <<EOF | make run
+cat <<EOF | make run-cli
 6 2 3
 1
 3 5
