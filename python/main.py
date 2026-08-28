@@ -43,78 +43,76 @@ def parse_stdin() -> Tuple[int, int, int, List[Tuple[int, int]], List[Tuple[int,
     return a, b, c, same_pairs, never_pairs
 
 
-def parse_interactive() -> Tuple[int, int, int, List[Tuple[int, int]], List[Tuple[int, int]]]:
-    # Prompts go to stderr to avoid polluting JSON stdout
-    sys.stderr.write("Enter 'a b c' (participants tables rounds):\n")
+def _read_int(prompt: str, invalid_msg: str) -> int:
+    sys.stderr.write(prompt)
     sys.stderr.flush()
     while True:
-        line = sys.stdin.readline()
-        parts = line.strip().split()
+        line = sys.stdin.readline().strip()
+        try:
+            return int(line)
+        except Exception:
+            sys.stderr.write(invalid_msg)
+            sys.stderr.flush()
+
+
+def _read_three_ints(prompt: str, invalid_msg: str) -> Tuple[int, int, int]:
+    sys.stderr.write(prompt)
+    sys.stderr.flush()
+    while True:
+        parts = sys.stdin.readline().strip().split()
         if len(parts) == 3:
             try:
                 a, b, c = map(int, parts)
-                break
+                return a, b, c
             except Exception:
                 pass
-        sys.stderr.write("Invalid. Please enter three integers: a b c\n")
+        sys.stderr.write(invalid_msg)
         sys.stderr.flush()
 
-    sys.stderr.write("Enter d (number of 'same-once' pairs):\n")
+
+def _read_pair(prompt: str, invalid_msg: str) -> Tuple[int, int]:
+    sys.stderr.write(prompt)
     sys.stderr.flush()
     while True:
-        line = sys.stdin.readline().strip()
-        try:
-            d = int(line)
-            break
-        except Exception:
-            sys.stderr.write("Invalid. Enter an integer for d.\n")
-            sys.stderr.flush()
-
-    same_pairs: List[Tuple[int, int]] = []
-    if d > 0:
-        sys.stderr.write(f"Enter {d} lines of 'e f' pairs for same-once:\n")
+        parts = sys.stdin.readline().strip().split()
+        if len(parts) == 2:
+            try:
+                u, v = int(parts[0]), int(parts[1])
+                return u, v
+            except Exception:
+                pass
+        sys.stderr.write(invalid_msg)
         sys.stderr.flush()
-        for _ in range(d):
-            while True:
-                line = sys.stdin.readline().strip().split()
-                if len(line) == 2:
-                    try:
-                        u, v = int(line[0]), int(line[1])
-                        same_pairs.append((u, v))
-                        break
-                    except Exception:
-                        pass
-                sys.stderr.write("Invalid. Enter two integers: e f\n")
-                sys.stderr.flush()
 
-    sys.stderr.write("Enter x (number of 'never-together' pairs):\n")
-    sys.stderr.flush()
-    while True:
-        line = sys.stdin.readline().strip()
-        try:
-            x = int(line)
-            break
-        except Exception:
-            sys.stderr.write("Invalid. Enter an integer for x.\n")
-            sys.stderr.flush()
 
-    never_pairs: List[Tuple[int, int]] = []
-    if x > 0:
-        sys.stderr.write(f"Enter {x} lines of 'y z' pairs for never-together:\n")
-        sys.stderr.flush()
-        for _ in range(x):
-            while True:
-                line = sys.stdin.readline().strip().split()
-                if len(line) == 2:
-                    try:
-                        y, z = int(line[0]), int(line[1])
-                        never_pairs.append((y, z))
-                        break
-                    except Exception:
-                        pass
-                sys.stderr.write("Invalid. Enter two integers: y z\n")
-                sys.stderr.flush()
-
+def parse_interactive() -> Tuple[int, int, int, List[Tuple[int, int]], List[Tuple[int, int]]]:
+    # Prompts go to stderr to avoid polluting JSON stdout
+    a, b, c = _read_three_ints(
+        "Enter 'a b c' (participants tables rounds):\n",
+        "Invalid. Please enter three integers: a b c\n",
+    )
+    d = _read_int(
+        "Enter d (number of 'same-once' pairs):\n",
+        "Invalid. Enter an integer for d.\n",
+    )
+    same_pairs = [
+        _read_pair(
+            f"Enter {d} lines of 'e f' pairs for same-once:\n",
+            "Invalid. Enter two integers: e f\n",
+        )
+        for _ in range(d)
+    ]
+    x = _read_int(
+        "Enter x (number of 'never-together' pairs):\n",
+        "Invalid. Enter an integer for x.\n",
+    )
+    never_pairs = [
+        _read_pair(
+            f"Enter {x} lines of 'y z' pairs for never-together:\n",
+            "Invalid. Enter two integers: y z\n",
+        )
+        for _ in range(x)
+    ]
     return a, b, c, same_pairs, never_pairs
 
 

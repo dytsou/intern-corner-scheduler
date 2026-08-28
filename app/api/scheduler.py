@@ -63,7 +63,14 @@ class ScheduleResponse(BaseModel):
     solver_status: str
 
 
-@router.post("/schedule", response_model=ScheduleResponse)
+@router.post(
+    "/schedule",
+    response_model=ScheduleResponse,
+    responses={
+        400: {"description": "Invalid input constraints"},
+        500: {"description": "Error generating schedule"},
+    },
+)
 async def create_schedule(request: ScheduleRequest):
     """
     Create a round-table schedule based on the provided constraints.
