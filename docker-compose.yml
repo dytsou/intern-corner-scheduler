@@ -24,7 +24,7 @@ services:
       dockerfile: Dockerfile.frontend
     container_name: scheduler-web
     ports:
-      - "${WEB_PORT:-5173}:80"
+      - "${WEB_PORT:-5173}:8080"
     depends_on:
       - scheduler-api
     restart: unless-stopped
