@@ -143,10 +143,6 @@ input:focus-visible {
       ),
       linear-gradient(140deg, var(--sheet), var(--accent-soft));
   }
-
-  .hero-detail {
-    background: rgb(34 42 60 / 78%);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -160,5 +156,10 @@ input:focus-visible {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .button-spinner {
+    animation-duration: 6s !important;
+    animation-iteration-count: infinite !important;
   }
 }

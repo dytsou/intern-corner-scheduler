@@ -81,10 +81,7 @@ function ScheduleForm({ onSubmit, onCancel, loading, cancelling }) {
   return (
     <section className="card form-card" id="input-section">
       <div className="section-heading">
-        <div>
-          <p className="section-eyebrow">STEP 1 · YOUR EVENT</p>
-          <h2>Schedule Parameters</h2>
-        </div>
+        <h2>Schedule Parameters</h2>
       </div>
       <p className="section-intro">
         Choose your group size, tables, and rounds. Add anyone you want to bring
@@ -228,10 +225,25 @@ function ScheduleForm({ onSubmit, onCancel, loading, cancelling }) {
           </fieldset>
         </div>
 
-        <button type="submit" className="btn-primary" disabled={loading}>
-          <span>{loading ? 'Generating...' : 'Generate Schedule'}</span>
+        <button
+          type="submit"
+          className="btn-primary"
+          disabled={loading}
+          aria-busy={loading}
+        >
+          <span className="button-label">
+            {loading && (
+              <progress
+                className="button-spinner"
+                aria-label="Generating schedule"
+              />
+            )}
+            <span>
+              {loading ? 'Generating schedule…' : 'Generate Schedule'}
+            </span>
+          </span>
           <span className="button-arrow" aria-hidden="true">
-            ↗
+            {loading ? '⋯' : '↗'}
           </span>
         </button>
       </form>
