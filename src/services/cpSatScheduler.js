@@ -1,5 +1,34 @@
 const SOLUTION_STATUSES = new Set(['OPTIMAL', 'FEASIBLE']);
 
+function getPairEndpoints(pair) {
+  if (Array.isArray(pair)) {
+    return pair.length === 2 ? pair : null;
+  }
+
+  if (!pair || typeof pair !== 'object') {
+    return null;
+  }
+
+  if (!Object.hasOwn(pair, 'u') || !Object.hasOwn(pair, 'v')) {
+    return null;
+  }
+
+  return [pair.u, pair.v];
+}
+
+function isValidPair(endpoints, participants) {
+  const [left, right] = endpoints;
+  return (
+    Number.isSafeInteger(left) &&
+    Number.isSafeInteger(right) &&
+    left !== right &&
+    left >= 1 &&
+    right >= 1 &&
+    left <= participants &&
+    right <= participants
+  );
+}
+
 export function normalizePairs(pairs, participants) {
   if (!Array.isArray(pairs)) {
     return [];
@@ -8,33 +37,12 @@ export function normalizePairs(pairs, participants) {
   const seen = new Set();
   const normalized = [];
   for (const pair of pairs) {
-    const endpoints =
-      Array.isArray(pair) && pair.length === 2
-        ? pair
-        : pair &&
-            typeof pair === 'object' &&
-            !Array.isArray(pair) &&
-            Object.hasOwn(pair, 'u') &&
-            Object.hasOwn(pair, 'v')
-          ? [pair.u, pair.v]
-          : null;
-    if (!endpoints) {
+    const endpoints = getPairEndpoints(pair);
+    if (!endpoints || !isValidPair(endpoints, participants)) {
       continue;
     }
 
     const [left, right] = endpoints;
-    if (
-      !Number.isSafeInteger(left) ||
-      !Number.isSafeInteger(right) ||
-      left === right ||
-      left < 1 ||
-      right < 1 ||
-      left > participants ||
-      right > participants
-    ) {
-      continue;
-    }
-
     const normalizedPair = left < right ? [left, right] : [right, left];
     const key = `${normalizedPair[0]}:${normalizedPair[1]}`;
     if (seen.has(key)) {
@@ -79,7 +87,7 @@ function computeTableSizes(participants, tables) {
 
 function makeVariableGrid(participants, tables, rounds) {
   return Array.from({ length: participants + 1 }, () =>
-    Array.from({ length: tables + 1 }, () => Array(rounds))
+    Array.from({ length: tables + 1 }, () => new Array(rounds))
   );
 }
 
@@ -92,9 +100,9 @@ function addConjunction(model, name, left, right) {
 }
 
 function addTableBalance(model, LinearExpr, x, participants, tables, rounds) {
-  const sizes = Array.from({ length: tables + 1 }, () => Array(rounds));
-  const minSizes = Array(rounds);
-  const maxSizes = Array(rounds);
+  const sizes = Array.from({ length: tables + 1 }, () => new Array(rounds));
+  const minSizes = new Array(rounds);
+  const maxSizes = new Array(rounds);
 
   for (let round = 0; round < rounds; round += 1) {
     minSizes[round] = model.newIntVar(0, participants, `min_size_r${round}`);
@@ -264,6 +272,81 @@ function addHostDiversity(
   return { visitedAny, distinctPairHost };
 }
 
+function addParticipantVariables(model, x, participants, tables, rounds) {
+  for (let participant = 1; participant <= participants; participant += 1) {
+    for (let table = 1; table <= tables; table += 1) {
+      for (let round = 0; round < rounds; round += 1) {
+        x[participant][table][round] = model.newBoolVar(
+          `x_${participant}_t${table}_r${round}`
+        );
+      }
+    }
+  }
+}
+
+function addOneTablePerParticipantAndRound(
+  model,
+  x,
+  participants,
+  tables,
+  rounds
+) {
+  for (let participant = 1; participant <= participants; participant += 1) {
+    for (let round = 0; round < rounds; round += 1) {
+      model.addExactlyOne(
+        Array.from(
+          { length: tables },
+          (_value, index) => x[participant][index + 1][round]
+        )
+      );
+    }
+  }
+}
+
+function fixHostAssignments(model, x, tables, rounds) {
+  for (let host = 1; host <= tables; host += 1) {
+    for (let round = 0; round < rounds; round += 1) {
+      for (let table = 1; table <= tables; table += 1) {
+        model.add(x[host][table][round].eq(table === host ? 1 : 0));
+      }
+    }
+  }
+}
+
+function applyNeverTogetherConstraints(model, x, pairs, tables, rounds) {
+  for (const [left, right] of pairs) {
+    for (let round = 0; round < rounds; round += 1) {
+      for (let table = 1; table <= tables; table += 1) {
+        model.add(x[left][table][round].plus(x[right][table][round]).le(1));
+      }
+    }
+  }
+}
+
+function buildObjectiveExpression(
+  cpSatApi,
+  meetByPairAndRound,
+  visitedAny,
+  distinctPairHost
+) {
+  const objectiveTerms = [];
+  for (const meetVars of meetByPairAndRound) {
+    for (const variable of meetVars) {
+      objectiveTerms.push(cpSatApi.LinearExpr.term(variable, 1000));
+    }
+  }
+  for (const variable of visitedAny.values()) {
+    objectiveTerms.push(cpSatApi.LinearExpr.term(variable, 1));
+  }
+  for (const variable of distinctPairHost.values()) {
+    objectiveTerms.push(cpSatApi.LinearExpr.term(variable, 5));
+  }
+
+  return objectiveTerms.length === 0
+    ? cpSatApi.LinearExpr.constant(0)
+    : cpSatApi.LinearExpr.sum(objectiveTerms);
+}
+
 export function buildCpSatModel(input, cpSatApi) {
   if (!cpSatApi?.CpModel || !cpSatApi?.LinearExpr) {
     throw new TypeError('buildCpSatModel requires CpModel and LinearExpr');
@@ -277,27 +360,8 @@ export function buildCpSatModel(input, cpSatApi) {
   );
   const model = new cpSatApi.CpModel();
   const x = makeVariableGrid(participants, tables, rounds);
-
-  for (let participant = 1; participant <= participants; participant += 1) {
-    for (let table = 1; table <= tables; table += 1) {
-      for (let round = 0; round < rounds; round += 1) {
-        x[participant][table][round] = model.newBoolVar(
-          `x_${participant}_t${table}_r${round}`
-        );
-      }
-    }
-  }
-
-  for (let participant = 1; participant <= participants; participant += 1) {
-    for (let round = 0; round < rounds; round += 1) {
-      model.addExactlyOne(
-        Array.from(
-          { length: tables },
-          (_value, index) => x[participant][index + 1][round]
-        )
-      );
-    }
-  }
+  addParticipantVariables(model, x, participants, tables, rounds);
+  addOneTablePerParticipantAndRound(model, x, participants, tables, rounds);
 
   const tableSizeVars = addTableBalance(
     model,
@@ -307,22 +371,8 @@ export function buildCpSatModel(input, cpSatApi) {
     tables,
     rounds
   );
-
-  for (let host = 1; host <= tables; host += 1) {
-    for (let round = 0; round < rounds; round += 1) {
-      for (let table = 1; table <= tables; table += 1) {
-        model.add(x[host][table][round].eq(table === host ? 1 : 0));
-      }
-    }
-  }
-
-  for (const [left, right] of neverTogetherPairs) {
-    for (let round = 0; round < rounds; round += 1) {
-      for (let table = 1; table <= tables; table += 1) {
-        model.add(x[left][table][round].plus(x[right][table][round]).le(1));
-      }
-    }
-  }
+  fixHostAssignments(model, x, tables, rounds);
+  applyNeverTogetherConstraints(model, x, neverTogetherPairs, tables, rounds);
 
   const { meetByPairAndRound, meetByPairAndHost } = addSameOnce(
     model,
@@ -350,22 +400,13 @@ export function buildCpSatModel(input, cpSatApi) {
     rounds
   );
 
-  const objectiveTerms = [];
-  for (const meetVars of meetByPairAndRound) {
-    for (const variable of meetVars) {
-      objectiveTerms.push(cpSatApi.LinearExpr.term(variable, 1000));
-    }
-  }
-  for (const variable of visitedAny.values()) {
-    objectiveTerms.push(cpSatApi.LinearExpr.term(variable, 1));
-  }
-  for (const variable of distinctPairHost.values()) {
-    objectiveTerms.push(cpSatApi.LinearExpr.term(variable, 5));
-  }
   model.maximize(
-    objectiveTerms.length === 0
-      ? cpSatApi.LinearExpr.constant(0)
-      : cpSatApi.LinearExpr.sum(objectiveTerms)
+    buildObjectiveExpression(
+      cpSatApi,
+      meetByPairAndRound,
+      visitedAny,
+      distinctPairHost
+    )
   );
 
   return {
@@ -396,72 +437,86 @@ function pairSharesTable(assignments, left, right, round) {
   );
 }
 
-export function mapCpSatResponse(input, modelData, solver, status) {
-  const solverStatus =
-    typeof solver.statusName === 'function'
-      ? solver.statusName(status)
-      : String(status);
-  const resultHasSolution = hasSolution(solverStatus);
+function getSolverStatus(solver, status) {
+  return typeof solver.statusName === 'function'
+    ? solver.statusName(status)
+    : String(status);
+}
+
+function createAssignments(modelData, solver) {
   const assignments = [];
 
-  if (resultHasSolution) {
-    for (let round = 0; round < modelData.rounds; round += 1) {
-      const roundTables = Array.from({ length: modelData.tables }, () => []);
-      for (let table = 1; table <= modelData.tables; table += 1) {
-        for (
-          let participant = 1;
-          participant <= modelData.participants;
-          participant += 1
+  for (let round = 0; round < modelData.rounds; round += 1) {
+    const roundTables = Array.from({ length: modelData.tables }, () => []);
+    for (let table = 1; table <= modelData.tables; table += 1) {
+      for (
+        let participant = 1;
+        participant <= modelData.participants;
+        participant += 1
+      ) {
+        if (
+          Number(solver.value(modelData.x[participant][table][round])) === 1
         ) {
-          if (
-            Number(solver.value(modelData.x[participant][table][round])) === 1
-          ) {
-            roundTables[table - 1].push(participant);
-          }
+          roundTables[table - 1].push(participant);
         }
       }
-      assignments.push(roundTables);
     }
+    assignments.push(roundTables);
   }
 
-  const tableSizesPerRound = assignments.map((roundTables) =>
-    roundTables.map((table) => table.length)
-  );
+  return assignments;
+}
+
+function classifySameOncePairs(sameOncePairs, assignments) {
   const satisfiedSameOncePairs = [];
   const unsatisfiedSameOncePairs = [];
-  const neverTogetherViolations = [];
 
-  for (const pair of modelData.sameOncePairs) {
+  for (const pair of sameOncePairs) {
     const [left, right] = pair;
     const meetingCount = assignments.reduce(
       (count, _roundTables, round) =>
         count + Number(pairSharesTable(assignments, left, right, round)),
       0
     );
-    (meetingCount === 1
-      ? satisfiedSameOncePairs
-      : unsatisfiedSameOncePairs
-    ).push(pair);
+    if (meetingCount === 1) {
+      satisfiedSameOncePairs.push(pair);
+    } else {
+      unsatisfiedSameOncePairs.push(pair);
+    }
   }
 
-  if (resultHasSolution) {
-    for (const pair of modelData.neverTogetherPairs) {
-      const [left, right] = pair;
-      if (
-        assignments.some((_roundTables, round) =>
-          pairSharesTable(assignments, left, right, round)
-        )
-      ) {
-        neverTogetherViolations.push(pair);
-      }
-    }
-  } else {
-    unsatisfiedSameOncePairs.splice(
-      0,
-      unsatisfiedSameOncePairs.length,
-      ...modelData.sameOncePairs
+  return { satisfiedSameOncePairs, unsatisfiedSameOncePairs };
+}
+
+function findNeverTogetherViolations(pairs, assignments) {
+  const violations = [];
+  for (const pair of pairs) {
+    const [left, right] = pair;
+    const shareAnyTable = assignments.some((_roundTables, round) =>
+      pairSharesTable(assignments, left, right, round)
     );
+    if (shareAnyTable) {
+      violations.push(pair);
+    }
   }
+
+  return violations;
+}
+
+export function mapCpSatResponse(input, modelData, solver, status) {
+  const solverStatus = getSolverStatus(solver, status);
+  const resultHasSolution = hasSolution(solverStatus);
+  const assignments = resultHasSolution
+    ? createAssignments(modelData, solver)
+    : [];
+  const tableSizesPerRound = assignments.map((roundTables) =>
+    roundTables.map((table) => table.length)
+  );
+  const { satisfiedSameOncePairs, unsatisfiedSameOncePairs } =
+    classifySameOncePairs(modelData.sameOncePairs, assignments);
+  const neverTogetherViolations = resultHasSolution
+    ? findNeverTogetherViolations(modelData.neverTogetherPairs, assignments)
+    : [];
 
   return {
     participants: modelData.participants,
