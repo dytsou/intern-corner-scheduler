@@ -27,7 +27,12 @@ test('solves in the browser and renders the existing result view', async ({
   page,
 }) => {
   const backendRequests = watchForBackendRequests(page);
-  await page.goto('/');
+  const response = await page.goto('/');
+  expect(response).not.toBeNull();
+  expect(response.headers()['cross-origin-opener-policy']).toBe('same-origin');
+  expect(response.headers()['cross-origin-embedder-policy']).toBe(
+    'require-corp'
+  );
 
   await expect
     .poll(() => page.evaluate(() => window.crossOriginIsolated))
