@@ -168,6 +168,12 @@ header h1 {
   background: #475569;
 }
 
+.cancel-solve-button {
+  margin-top: 1rem;
+  min-height: 48px;
+  width: 100%;
+}
+
 /* Statistics Grid */
 .statistics-grid {
   display: grid;

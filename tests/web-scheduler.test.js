@@ -159,7 +159,22 @@ function objectiveTerms(objective) {
 test('normalizes pairs using the Python scheduler rules', () => {
   assert.deepEqual(
     normalizePairs(
-      [[4, 2], [2, 4], [3, 3], [0, 1], [-1, 2], [1, 7], null, [], [5, 6]],
+      [
+        [4, 2],
+        [2, 4],
+        { u: 6, v: 5 },
+        { u: 5, v: 6 },
+        { u: 1, v: 1 },
+        { u: 0, v: 1 },
+        { u: 1, v: 7 },
+        { left: 2, right: 3 },
+        [3, 3],
+        [0, 1],
+        [-1, 2],
+        [1, 7],
+        null,
+        [],
+      ],
       6
     ),
     [

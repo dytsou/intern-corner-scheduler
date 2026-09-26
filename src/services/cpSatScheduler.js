@@ -8,11 +8,21 @@ export function normalizePairs(pairs, participants) {
   const seen = new Set();
   const normalized = [];
   for (const pair of pairs) {
-    if (!Array.isArray(pair) || pair.length !== 2) {
+    const endpoints =
+      Array.isArray(pair) && pair.length === 2
+        ? pair
+        : pair &&
+            typeof pair === 'object' &&
+            !Array.isArray(pair) &&
+            Object.hasOwn(pair, 'u') &&
+            Object.hasOwn(pair, 'v')
+          ? [pair.u, pair.v]
+          : null;
+    if (!endpoints) {
       continue;
     }
 
-    const [left, right] = pair;
+    const [left, right] = endpoints;
     if (
       !Number.isSafeInteger(left) ||
       !Number.isSafeInteger(right) ||

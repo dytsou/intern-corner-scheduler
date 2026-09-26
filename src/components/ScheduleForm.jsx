@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import PairInput from './PairInput';
 
-function ScheduleForm({ onSubmit, loading }) {
+function ScheduleForm({ onSubmit, onCancel, loading, cancelling }) {
   const [participants, setParticipants] = useState('');
   const [tables, setTables] = useState('');
   const [rounds, setRounds] = useState('');
@@ -85,6 +85,7 @@ function ScheduleForm({ onSubmit, loading }) {
         id="schedule-form"
         onSubmit={handleSubmit}
         className={loading ? 'loading' : ''}
+        aria-busy={loading}
       >
         <div className="form-group">
           <label htmlFor="participants">Number of Participants</label>
@@ -200,6 +201,18 @@ function ScheduleForm({ onSubmit, loading }) {
           {loading ? 'Generating...' : 'Generate Schedule'}
         </button>
       </form>
+      {loading && (
+        <button
+          id="cancel-solve"
+          type="button"
+          className="btn-secondary cancel-solve-button"
+          onClick={onCancel}
+          disabled={cancelling}
+          aria-controls="schedule-form"
+        >
+          {cancelling ? 'Stopping solver…' : 'Cancel schedule generation'}
+        </button>
+      )}
     </section>
   );
 }
