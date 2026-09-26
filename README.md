@@ -84,13 +84,13 @@ Connect the repository to Cloudflare Pages with these build settings:
 
 | Setting | Value |
 | --- | --- |
-| Build command | `pnpm install --frozen-lockfile && pnpm build` |
+| Build command | `pnpm run build:cloudflare` |
 | Build output directory | `docs` |
 | `NODE_VERSION` | `22` |
 | `PNPM_VERSION` | `10.20.0` |
 | `SKIP_DEPENDENCY_INSTALL` | `1` |
 
-Keep the Pages project static: no Pages Functions or Worker API are needed for browser scheduling.
+The build command installs locked dependencies and generates `docs/` in one step. `SKIP_DEPENDENCY_INSTALL=1` prevents Pages from running a second dependency install. Keep the Pages project static: no Pages Functions or Worker API are needed for browser scheduling.
 
 ### Python API and CLI
 
