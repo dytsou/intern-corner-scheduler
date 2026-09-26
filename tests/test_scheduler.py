@@ -157,3 +157,28 @@ class TestSchedule:
         for r in range(2):
             sizes = result["table_sizes_per_round"][r]
             assert max(sizes) - min(sizes) <= 1
+
+    def test_non_host_pairs_meet_at_most_once_across_schedule(self):
+        """Every non-host pair is limited to one shared table over all rounds."""
+        result = schedule(
+            num_participants=6,
+            num_tables=2,
+            num_rounds=3,
+            same_once_pairs=[],
+            never_together_pairs=[],
+            time_limit_seconds=10,
+        )
+
+        pair_counts = {
+            (left, right): 0
+            for left in range(3, 7)
+            for right in range(left + 1, 7)
+        }
+        for round_tables in result["assignments"]:
+            for table in round_tables:
+                non_hosts = sorted(participant for participant in table if participant > 2)
+                for index, left in enumerate(non_hosts):
+                    for right in non_hosts[index + 1 :]:
+                        pair_counts[(left, right)] += 1
+
+        assert all(count <= 1 for count in pair_counts.values())

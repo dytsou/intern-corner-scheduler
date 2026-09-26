@@ -30,12 +30,14 @@
     "dev": "vite",
     "build": "vite build && node scripts/create-nojekyll.js",
     "preview": "vite preview",
+    "test": "node --test tests/web-scheduler.test.js",
     "lint": "eslint . --ext js,jsx --ignore-pattern 'docs/**' --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write \"src/**/*.{js,jsx,json,css}\" \"scripts/**/*.js\" \"*.{js,json,html}\"",
     "format:check": "prettier --check \"src/**/*.{js,jsx,json,css}\" \"scripts/**/*.js\" \"*.{js,json,html}\"",
     "publish:npmjs": "npm publish --access public --registry https://registry.npmjs.org"
   },
   "dependencies": {
+    "or-tools-wasm": "0.9.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
@@ -55,6 +57,9 @@
     "overrides": {
       "@babel/core": "7.29.6",
       "brace-expansion@1": "1.1.18"
+    },
+    "patchedDependencies": {
+      "or-tools-wasm@0.9.1": "patches/or-tools-wasm@0.9.1.patch"
     }
   },
   "publishConfig": {
