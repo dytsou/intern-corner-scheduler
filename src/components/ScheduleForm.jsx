@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import PairInput from './PairInput';
 
 function ScheduleForm({ onSubmit, onCancel, loading, cancelling }) {
@@ -8,13 +8,14 @@ function ScheduleForm({ onSubmit, onCancel, loading, cancelling }) {
   const [timeLimit, setTimeLimit] = useState(60);
   const [sameOncePairs, setSameOncePairs] = useState([]);
   const [neverTogetherPairs, setNeverTogetherPairs] = useState([]);
+  const nextPairId = useRef(0);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const participantsNum = parseInt(participants);
-    const tablesNum = parseInt(tables);
-    const roundsNum = parseInt(rounds);
+    const participantsNum = Number.parseInt(participants, 10);
+    const tablesNum = Number.parseInt(tables, 10);
+    const roundsNum = Number.parseInt(rounds, 10);
 
     // Validation
     if (tablesNum > participantsNum) {
@@ -51,11 +52,17 @@ function ScheduleForm({ onSubmit, onCancel, loading, cancelling }) {
   };
 
   const addSameOncePair = () => {
-    setSameOncePairs([...sameOncePairs, { u: '', v: '' }]);
+    setSameOncePairs([
+      ...sameOncePairs,
+      { id: nextPairId.current++, u: '', v: '' },
+    ]);
   };
 
   const addNeverTogetherPair = () => {
-    setNeverTogetherPairs([...neverTogetherPairs, { u: '', v: '' }]);
+    setNeverTogetherPairs([
+      ...neverTogetherPairs,
+      { id: nextPairId.current++, u: '', v: '' },
+    ]);
   };
 
   const updateSameOncePair = (index, field, value) => {
@@ -153,7 +160,9 @@ function ScheduleForm({ onSubmit, onCancel, loading, cancelling }) {
               max="300"
               aria-describedby="time-limit-help"
               value={timeLimit}
-              onChange={(e) => setTimeLimit(parseInt(e.target.value))}
+              onChange={(e) =>
+                setTimeLimit(Number.parseInt(e.target.value, 10))
+              }
             />
             <small id="time-limit-help">
               Maximum time for the solver (1-300 seconds)
@@ -180,7 +189,7 @@ function ScheduleForm({ onSubmit, onCancel, loading, cancelling }) {
             <div className="pairs-container">
               {sameOncePairs.map((pair, index) => (
                 <PairInput
-                  key={index}
+                  key={pair.id}
                   pair={pair}
                   pairLabel={`Same-once pair ${index + 1}`}
                   helpId="same-once-help"
@@ -211,7 +220,7 @@ function ScheduleForm({ onSubmit, onCancel, loading, cancelling }) {
             <div className="pairs-container">
               {neverTogetherPairs.map((pair, index) => (
                 <PairInput
-                  key={index}
+                  key={pair.id}
                   pair={pair}
                   pairLabel={`Never-together pair ${index + 1}`}
                   helpId="never-together-help"

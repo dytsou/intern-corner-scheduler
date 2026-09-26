@@ -7,7 +7,13 @@ function TableAssignments({ schedule, currentRound }) {
         <h3 className="round-title">Round {currentRound + 1}</h3>
         <div className="tables-grid">
           {roundAssignments.map((table, tableIndex) => (
-            <div key={tableIndex} className="table-card">
+            <div
+              key={table
+                .slice()
+                .sort((left, right) => left - right)
+                .join('-')}
+              className="table-card"
+            >
               <div className="table-header">
                 <span className="table-number">Table {tableIndex + 1}</span>
                 <span className="table-size">

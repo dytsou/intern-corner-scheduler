@@ -6,8 +6,14 @@ function PairStatus({ schedule }) {
       <div className="pair-status-section">
         <h3>{title}</h3>
         <div className="pair-list">
-          {pairs.map((pair, index) => (
-            <span key={index} className={`pair-badge ${className}`}>
+          {pairs.map((pair) => (
+            <span
+              key={pair
+                .slice()
+                .sort((left, right) => left - right)
+                .join('-')}
+              className={`pair-badge ${className}`}
+            >
               {pair[0]} × {pair[1]}
             </span>
           ))}

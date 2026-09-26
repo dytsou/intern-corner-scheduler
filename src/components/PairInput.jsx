@@ -1,12 +1,12 @@
 function PairInput({ pair, pairLabel, helpId, onChange, onRemove }) {
   const handleUChange = (e) => {
     const value = e.target.value;
-    onChange('u', value === '' ? '' : parseInt(value) || '');
+    onChange('u', value === '' ? '' : Number.parseInt(value, 10) || '');
   };
 
   const handleVChange = (e) => {
     const value = e.target.value;
-    onChange('v', value === '' ? '' : parseInt(value) || '');
+    onChange('v', value === '' ? '' : Number.parseInt(value, 10) || '');
   };
 
   return (
