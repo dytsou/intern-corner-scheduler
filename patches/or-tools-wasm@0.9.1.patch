@@ -1,0 +1,71 @@
+diff --git a/build/javascript/browser/runtime_loader.js b/build/javascript/browser/runtime_loader.js
+index bb3540eaed5fdcc9671598a0e3e7e80380b935eb..72f4748a787e730f5c076d7359ce66b91a41889a 100644
+--- a/build/javascript/browser/runtime_loader.js
++++ b/build/javascript/browser/runtime_loader.js
+@@ -12,66 +12,6 @@ const runtimeAssets = {
+       jsUrl: new URL("../wasm/cp_sat_runtime_asyncify.js", import.meta.url).href,
+       wasmUrl: new URL("../wasm/cp_sat_runtime_asyncify.wasm", import.meta.url).href
+     }
+-  },
+-  routing_runtime: {
+-    jspi: {
+-      jsUrl: new URL("../wasm/routing_runtime.js", import.meta.url).href,
+-      wasmUrl: new URL("../wasm/routing_runtime.wasm", import.meta.url).href
+-    },
+-    asyncify: {
+-      jsUrl: new URL("../wasm/routing_runtime_asyncify.js", import.meta.url).href,
+-      wasmUrl: new URL("../wasm/routing_runtime_asyncify.wasm", import.meta.url).href
+-    }
+-  },
+-  mp_solver_runtime: {
+-    jspi: {
+-      jsUrl: new URL("../wasm/mp_solver_runtime.js", import.meta.url).href,
+-      wasmUrl: new URL("../wasm/mp_solver_runtime.wasm", import.meta.url).href
+-    },
+-    asyncify: {
+-      jsUrl: new URL("../wasm/mp_solver_runtime_asyncify.js", import.meta.url).href,
+-      wasmUrl: new URL("../wasm/mp_solver_runtime_asyncify.wasm", import.meta.url).href
+-    }
+-  },
+-  mathopt_runtime: {
+-    jspi: {
+-      jsUrl: new URL("../wasm/mathopt_runtime.js", import.meta.url).href,
+-      wasmUrl: new URL("../wasm/mathopt_runtime.wasm", import.meta.url).href
+-    },
+-    asyncify: {
+-      jsUrl: new URL("../wasm/mathopt_runtime_asyncify.js", import.meta.url).href,
+-      wasmUrl: new URL("../wasm/mathopt_runtime_asyncify.wasm", import.meta.url).href
+-    }
+-  },
+-  pdlp_runtime: {
+-    jspi: {
+-      jsUrl: new URL("../wasm/pdlp_runtime.js", import.meta.url).href,
+-      wasmUrl: new URL("../wasm/pdlp_runtime.wasm", import.meta.url).href
+-    },
+-    asyncify: {
+-      jsUrl: new URL("../wasm/pdlp_runtime_asyncify.js", import.meta.url).href,
+-      wasmUrl: new URL("../wasm/pdlp_runtime_asyncify.wasm", import.meta.url).href
+-    }
+-  },
+-  graph_runtime: {
+-    jspi: {
+-      jsUrl: new URL("../wasm/graph_runtime.js", import.meta.url).href,
+-      wasmUrl: new URL("../wasm/graph_runtime.wasm", import.meta.url).href
+-    },
+-    asyncify: {
+-      jsUrl: new URL("../wasm/graph_runtime_asyncify.js", import.meta.url).href,
+-      wasmUrl: new URL("../wasm/graph_runtime_asyncify.wasm", import.meta.url).href
+-    }
+-  },
+-  set_cover_runtime: {
+-    jspi: {
+-      jsUrl: new URL("../wasm/set_cover_runtime.js", import.meta.url).href,
+-      wasmUrl: new URL("../wasm/set_cover_runtime.wasm", import.meta.url).href
+-    },
+-    asyncify: {
+-      jsUrl: new URL("../wasm/set_cover_runtime_asyncify.js", import.meta.url).href,
+-      wasmUrl: new URL("../wasm/set_cover_runtime_asyncify.wasm", import.meta.url).href
+-    }
+   }
+ };
+ async function loadFactory(runtimeUrl) {

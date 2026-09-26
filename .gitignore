@@ -23,6 +23,10 @@ docs/**
 vite.config.*.timestamp-*
 vite.config.*.tsbuildinfo
 
+# Playwright
+test-results/
+playwright-report/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

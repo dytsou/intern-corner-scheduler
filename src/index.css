@@ -1,38 +1,165 @@
-/* Modern CSS Reset and Base Styles */
+:root {
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+
+  --paper: #f4f6ff;
+  --sheet: #ffffff;
+  --surface: #f8f9ff;
+  --input: #fbfcff;
+  --ink: #27334d;
+  --muted: #596780;
+  --line: #e0e5f1;
+  --line-strong: #c5cee0;
+  --accent: #5369dc;
+  --accent-hover: #4358c5;
+  --accent-ink: #3348ad;
+  --accent-soft: #edf0ff;
+  --accent-line: #d8defb;
+  --accent-ring: rgb(83 105 220 / 20%);
+  --accent-shadow: rgb(83 105 220 / 23%);
+  --coral: #e86e7b;
+  --coral-soft: #fff0f2;
+  --coral-line: #f5d3d8;
+  --danger: #ad4050;
+  --danger-ink: #963746;
+  --lavender: #8372d5;
+  --lavender-ink: #5c4eaa;
+  --lavender-soft: #f1efff;
+  --lavender-line: #dfdaf8;
+  --mint: #39977f;
+  --mint-ink: #277760;
+  --mint-soft: #e7f6f1;
+  --mint-line: #c8e8dd;
+  --gold-ink: #795417;
+  --gold-soft: #fff5df;
+  --gold-line: #f1dfb8;
+  --shadow: 0 14px 38px rgb(49 63 105 / 8%);
+  --shadow-small: 0 6px 18px rgb(49 63 105 / 7%);
+}
+
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
-:root {
-  --primary-color: #2563eb;
-  --primary-hover: #1d4ed8;
-  --secondary-color: #64748b;
-  --success-color: #10b981;
-  --danger-color: #ef4444;
-  --warning-color: #f59e0b;
-  --bg-color: #f8fafc;
-  --card-bg: #ffffff;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --border-color: #e2e8f0;
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --shadow-lg:
-    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --border-radius: 8px;
-  --transition: all 0.2s ease;
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
 }
 
 body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
-    Arial, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-primary);
-  line-height: 1.6;
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 92% 7%, rgb(131 114 213 / 8%), transparent 23rem),
+    var(--paper);
+  font-family: Inter, 'Avenir Next', 'Segoe UI', 'Trebuchet MS', sans-serif;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--lavender);
+  outline-offset: 3px;
+}
+
+::selection {
+  color: white;
+  background: var(--accent);
 }
 
 #root {
   min-height: 100vh;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --paper: #171c2b;
+    --sheet: #222a3c;
+    --surface: #273047;
+    --input: #20283a;
+    --ink: #f2f4ff;
+    --muted: #c1c9dc;
+    --line: #3b4660;
+    --line-strong: #58647d;
+    --accent: #91a2ff;
+    --accent-hover: #a9b6ff;
+    --accent-ink: #d4daff;
+    --accent-soft: #2b3453;
+    --accent-line: #414d77;
+    --accent-ring: rgb(145 162 255 / 25%);
+    --accent-shadow: rgb(83 105 220 / 20%);
+    --coral: #f18a96;
+    --coral-soft: #422d3a;
+    --coral-line: #67404b;
+    --danger: #f08b9a;
+    --danger-ink: #ffc4cd;
+    --lavender: #b2a5ff;
+    --lavender-ink: #d5ccff;
+    --lavender-soft: #332f50;
+    --lavender-line: #514979;
+    --mint: #70c9ad;
+    --mint-ink: #b0f0d9;
+    --mint-soft: #263e3d;
+    --mint-line: #3e645b;
+    --gold-ink: #f2d28f;
+    --gold-soft: #433a2b;
+    --gold-line: #665638;
+    --shadow: 0 14px 38px rgb(0 0 0 / 24%);
+    --shadow-small: 0 6px 18px rgb(0 0 0 / 18%);
+  }
+
+  body {
+    background:
+      radial-gradient(
+        circle at 92% 7%,
+        rgb(178 165 255 / 8%),
+        transparent 23rem
+      ),
+      var(--paper);
+  }
+
+  .hero-panel {
+    background:
+      radial-gradient(
+        circle at 85% 18%,
+        rgb(178 165 255 / 10%),
+        transparent 17rem
+      ),
+      linear-gradient(140deg, var(--sheet), var(--accent-soft));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .button-spinner {
+    animation-duration: 6s !important;
+    animation-iteration-count: infinite !important;
+  }
 }
