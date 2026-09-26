@@ -30,6 +30,8 @@
     "dev": "vite",
     "build": "vite build && node scripts/create-nojekyll.js",
     "preview": "vite preview",
+    "deploy:preview": "pnpm build && pnpm dlx wrangler pages deploy ./docs --branch preview",
+    "deploy:production": "pnpm build && pnpm dlx wrangler pages deploy ./docs --branch main",
     "test": "node --test tests/web-scheduler.test.js",
     "test:browser": "playwright test",
     "lint": "eslint . --ext js,jsx --ignore-pattern 'docs/**' --report-unused-disable-directives --max-warnings 0",

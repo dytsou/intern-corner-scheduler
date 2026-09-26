@@ -2,7 +2,7 @@ PYTHON ?= python3
 PIP ?= pip3
 PNPM ?= pnpm
 
-.PHONY: install install-frontend install-backend run run-cli run-down serve serve-frontend serve-backend build lint test
+.PHONY: install install-frontend install-backend run run-cli run-down serve serve-frontend serve-backend build deploy-preview deploy-production lint test
 
 # Install all dependencies (Python backend + Node.js frontend)
 install: install-backend install-frontend
@@ -44,6 +44,14 @@ serve-frontend:
 # Build React app for production
 build:
 	$(PNPM) run build
+
+# Build and deploy the frontend to a Cloudflare Pages preview deployment
+deploy-preview:
+	$(PNPM) run deploy:preview
+
+# Build and deploy the frontend to the Cloudflare Pages production branch
+deploy-production:
+	$(PNPM) run deploy:production
 
 # Run tests
 test:
