@@ -32,11 +32,11 @@ make install
 
 ## Run
 
-### Web interface (frontend + backend via Docker)
+### Docker development stack (web UI + separate API)
 ```bash
-make run          # builds and starts both the API and the web UI in Docker
+make run          # builds and starts the web UI and the separate API in Docker
                   # web UI:  http://localhost:${WEB_PORT:-5173}
-                  # API:     http://localhost:${API_PORT:-8000}
+                  # API:     http://localhost:${API_PORT:-8000} (not used by browser scheduling)
 make run-down     # stop the Docker containers
 ```
 
@@ -60,43 +60,41 @@ cd python && python3 main.py < input.txt
 
 ## Web Interface
 
-A modern React + Vite web interface is available for easier use. The frontend is built with React and deployed to GitHub Pages, and the backend runs in Docker on an Ubuntu workstation.
+The React + Vite frontend solves schedules in the user's browser with OR-Tools CP-SAT compiled to WebAssembly. Cloudflare Pages serves static files; it does not run the Python API or receive schedule inputs.
 
-### Quick Start (Local Development)
+### Run the Frontend Locally
 
-1. **Install dependencies:**
-   ```bash
-   make install
-   ```
-   This will install both Python backend dependencies and Node.js frontend dependencies.
-   
-   **Note**: This project uses [pnpm](https://pnpm.io/) as the package manager. If you don't have pnpm installed, you can install it with:
-   ```bash
-   npm install -g pnpm
-   ```
-   Or follow the [pnpm installation guide](https://pnpm.io/installation).
+```bash
+pnpm install --frozen-lockfile
+pnpm dev
+```
 
-2. **Configure environment variables (optional):**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your settings if needed
-   ```
+To build and preview the production files locally:
 
-3. **Start the backend server:**
-   ```bash
-   make serve-backend
-   ```
-   The API will be available at `http://localhost:8000` (or the port specified in `.env`)
+```bash
+pnpm build
+pnpm preview
+```
 
-4. **Start the frontend development server:**
-   ```bash
-   make serve-frontend
-   ```
-   The frontend will be available at `http://localhost:5173` and will automatically reload on changes.
+The production output is written to `docs/`. The `public/_headers` file adds the COOP and COEP response headers needed for browser isolation.
 
-5. **Update backend URL (if needed):**
-   - Edit `src/config.js` and set `BACKEND_URL` to your backend address
-   - For production builds, update the URL before running `make build`
+### Cloudflare Pages Settings
+
+Connect the repository to Cloudflare Pages with these build settings:
+
+| Setting | Value |
+| --- | --- |
+| Build command | `pnpm install --frozen-lockfile && pnpm build` |
+| Build output directory | `docs` |
+| `NODE_VERSION` | `22` |
+| `PNPM_VERSION` | `10.20.0` |
+| `SKIP_DEPENDENCY_INSTALL` | `1` |
+
+Keep the Pages project static: no Pages Functions or Worker API are needed for browser scheduling.
+
+### Python API and CLI
+
+The Python CLI, FastAPI service, and Docker setup remain available as separate tools. Start the API locally with `make serve-backend`; its documentation is available at `http://localhost:8000/docs`. The browser frontend does not need a backend URL or API server.
 
 ## API Documentation
 
@@ -169,5 +167,3 @@ Returns the health status of the API.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-
