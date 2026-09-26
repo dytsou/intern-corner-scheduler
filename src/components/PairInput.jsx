@@ -10,7 +10,8 @@ function PairInput({ pair, pairLabel, helpId, onChange, onRemove }) {
   };
 
   return (
-    <div className="pair-item" role="group" aria-label={pairLabel}>
+    <fieldset className="pair-item">
+      <legend className="visually-hidden">{pairLabel}</legend>
       <span className="pair-label" aria-hidden="true">
         PAIR
       </span>
@@ -45,7 +46,7 @@ function PairInput({ pair, pairLabel, helpId, onChange, onRemove }) {
       >
         Remove
       </button>
-    </div>
+    </fieldset>
   );
 }
 

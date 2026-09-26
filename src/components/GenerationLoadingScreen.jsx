@@ -10,9 +10,9 @@ function GenerationLoadingScreen({
 }) {
   return (
     <div className="generation-screen">
-      <section
+      <dialog
+        open
         className="generation-loader"
-        role="dialog"
         aria-modal="true"
         aria-labelledby="generation-title"
       >
@@ -40,7 +40,7 @@ function GenerationLoadingScreen({
         >
           {cancelling ? 'Stopping…' : 'Cancel generation'}
         </button>
-      </section>
+      </dialog>
     </div>
   );
 }

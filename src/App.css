@@ -167,10 +167,16 @@
 }
 
 .generation-loader {
+  position: static;
   display: grid;
   justify-items: center;
   gap: 2rem;
   width: min(100%, 380px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
 }
 
 .generation-spinner {
@@ -419,10 +425,12 @@
 }
 
 .pair-item {
+  min-inline-size: 0;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.4rem;
+  margin: 0;
   padding: 0.5rem;
   border: 1px solid var(--line);
   border-radius: 14px;
