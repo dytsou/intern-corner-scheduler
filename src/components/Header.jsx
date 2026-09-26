@@ -1,3 +1,5 @@
+import LoadingSpinner from './LoadingSpinner';
+
 function Header() {
   return (
     <header className="site-header">
@@ -17,11 +19,7 @@ function Header() {
         </div>
 
         <div className="hero-loading" aria-hidden="true">
-          <div className="hero-spinner">
-            <span />
-            <span />
-            <span />
-          </div>
+          <LoadingSpinner />
           <span className="hero-loading-label">MIXING TABLES</span>
         </div>
       </div>

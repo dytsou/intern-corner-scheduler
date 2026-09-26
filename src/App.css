@@ -156,6 +156,78 @@
   letter-spacing: 0.14em;
 }
 
+.generation-screen {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgb(39 51 77 / 70%);
+}
+
+.generation-loader {
+  display: grid;
+  justify-items: center;
+  gap: 2rem;
+  width: min(100%, 380px);
+}
+
+.generation-spinner {
+  display: grid;
+  place-items: center;
+}
+
+.generation-screen .hero-spinner {
+  width: clamp(160px, 24vw, 220px);
+  height: clamp(160px, 24vw, 220px);
+  opacity: 0.5;
+}
+
+.generation-screen .hero-spinner::before {
+  inset: 14%;
+}
+
+.generation-screen .hero-spinner::after {
+  inset: 25%;
+}
+
+.generation-screen .hero-spinner span {
+  width: clamp(10px, 1.5vw, 14px);
+  height: clamp(10px, 1.5vw, 14px);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.generation-loader .error-message {
+  width: 100%;
+  margin: 0;
+}
+
+.generation-cancel {
+  min-width: 200px;
+  min-height: 52px;
+  justify-content: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .generation-screen .hero-spinner,
+  .generation-screen .hero-spinner::before,
+  .generation-screen .hero-spinner::after,
+  .generation-screen .hero-spinner span {
+    animation-duration: 6s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
+
 @keyframes hero-spinner-rotate {
   to {
     transform: rotate(360deg);

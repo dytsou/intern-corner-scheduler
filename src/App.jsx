@@ -3,6 +3,7 @@ import ScheduleForm from './components/ScheduleForm';
 import ResultsDisplay from './components/ResultsDisplay';
 import ErrorMessage from './components/ErrorMessage';
 import Header from './components/Header';
+import GenerationLoadingScreen from './components/GenerationLoadingScreen';
 import Footer from './components/Footer';
 import {
   cancelScheduleSolve,
@@ -99,35 +100,50 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <Header />
-      <div className="main-content">
-        {statusMessage && (
-          <p
-            className="solver-status"
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-          >
-            {statusMessage}
-          </p>
-        )}
-        {!schedule ? (
-          <ScheduleForm
-            onSubmit={handleScheduleSubmit}
-            onCancel={handleCancelSchedule}
-            loading={loading}
-            cancelling={cancelling}
-          />
-        ) : (
-          <ResultsDisplay schedule={schedule} onReset={handleReset} />
-        )}
-        {error && (
-          <ErrorMessage message={error} onDismiss={() => setError(null)} />
-        )}
+    <>
+      <div
+        className="container"
+        aria-hidden={loading || undefined}
+        inert={loading || undefined}
+      >
+        <Header />
+        <div className="main-content">
+          {statusMessage && (
+            <p
+              className="solver-status"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {statusMessage}
+            </p>
+          )}
+          {!schedule ? (
+            <ScheduleForm
+              onSubmit={handleScheduleSubmit}
+              onCancel={handleCancelSchedule}
+              loading={loading}
+              cancelling={cancelling}
+            />
+          ) : (
+            <ResultsDisplay schedule={schedule} onReset={handleReset} />
+          )}
+          {error && (
+            <ErrorMessage message={error} onDismiss={() => setError(null)} />
+          )}
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+      {loading && (
+        <GenerationLoadingScreen
+          statusMessage={statusMessage}
+          cancelling={cancelling}
+          error={error}
+          onCancel={handleCancelSchedule}
+          onDismissError={() => setError(null)}
+        />
+      )}
+    </>
   );
 }
 
