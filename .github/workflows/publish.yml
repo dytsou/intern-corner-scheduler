@@ -6,6 +6,12 @@ on:
       - main
     paths:
       - "package.json"
+      - "pnpm-lock.yaml"
+      - "vite.config.js"
+      - "index.html"
+      - "scripts/**"
+      - "src/**"
+      - ".npmrc"
   release:
     types: [created]
   workflow_dispatch:
@@ -22,7 +28,7 @@ jobs:
       id-token: write
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
         with:
           egress-policy: audit
 
@@ -31,219 +37,91 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: "22"
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Get package version
-        id: package-version
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Current package version: $VERSION"
-
-      - name: Get package name
-        id: package-name
-        run: |
-          PACKAGE_NAME=$(node -p "require('./package.json').name")
-          SCOPE="${PACKAGE_NAME%%/*}"
-          echo "name=$PACKAGE_NAME" >> "$GITHUB_OUTPUT"
-          echo "scope=$SCOPE" >> "$GITHUB_OUTPUT"
-          echo "Package name: $PACKAGE_NAME"
-          echo "Package scope: $SCOPE"
-
-      - name: Check if version exists on npmjs
-        id: check-npmjs
-        env:
-          PACKAGE_NAME: ${{ steps.package-name.outputs.name }}
-          PACKAGE_VERSION: ${{ steps.package-version.outputs.version }}
-        run: |
-          set -euo pipefail
-          ERROR_FILE="$RUNNER_TEMP/npmjs-version-check.log"
-          if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version --registry=https://registry.npmjs.org >"$ERROR_FILE" 2>&1; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "Version $PACKAGE_VERSION already exists on npmjs, skipping npmjs publish"
-          elif grep -qiE 'E404|404 Not Found' "$ERROR_FILE"; then
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-            echo "Version $PACKAGE_VERSION is new on npmjs"
-          else
-            cat "$ERROR_FILE"
-            echo "Could not check the npmjs version; stopping instead of treating a registry error as a missing version" >&2
-            exit 1
-          fi
-
-      - name: Check if version exists on GitHub Packages
-        id: check-github
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGE_NAME: ${{ steps.package-name.outputs.name }}
-          PACKAGE_SCOPE: ${{ steps.package-name.outputs.scope }}
-          PACKAGE_VERSION: ${{ steps.package-version.outputs.version }}
-        run: |
-          set -euo pipefail
-          npm config set "$PACKAGE_SCOPE:registry" https://npm.pkg.github.com
-          npm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
-          ERROR_FILE="$RUNNER_TEMP/github-packages-version-check.log"
-          if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version --registry=https://npm.pkg.github.com >"$ERROR_FILE" 2>&1; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "Version $PACKAGE_VERSION already exists on GitHub Packages, skipping GitHub Packages publish"
-          elif grep -qiE 'E404|404 Not Found' "$ERROR_FILE"; then
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-            echo "Version $PACKAGE_VERSION is new on GitHub Packages"
-          else
-            cat "$ERROR_FILE"
-            echo "Could not check the GitHub Packages version; stopping instead of treating a registry error as a missing version" >&2
-            exit 1
-          fi
-
-      - name: Install dependencies
-        if: ${{ steps.check-npmjs.outputs.exists == 'false' || steps.check-github.outputs.exists == 'false' }}
-        run: pnpm install --frozen-lockfile --ignore-scripts
-
-      - name: Verify package
-        if: ${{ steps.check-npmjs.outputs.exists == 'false' || steps.check-github.outputs.exists == 'false' }}
-        run: |
-          set -euo pipefail
-          trap 'rm -f ./*.tgz' EXIT
-          pnpm pack
-
       - name: Publish to npmjs
-        if: ${{ steps.check-npmjs.outputs.exists == 'false' }}
-        id: publish-npmjs
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          PACKAGE_NAME: ${{ steps.package-name.outputs.name }}
-          PACKAGE_SCOPE: ${{ steps.package-name.outputs.scope }}
-          PACKAGE_VERSION: ${{ steps.package-version.outputs.version }}
-        run: |
-          set -euo pipefail
-          npm config set "$PACKAGE_SCOPE:registry" https://registry.npmjs.org
-          npm config set registry https://registry.npmjs.org
-          npm config set "//registry.npmjs.org/:_authToken" "$NODE_AUTH_TOKEN"
-          pnpm publish --access public --no-git-checks --registry=https://registry.npmjs.org || {
-            if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version --registry=https://registry.npmjs.org >/dev/null 2>&1; then
-              echo "Version already exists on npmjs, skipping duplicate publish"
-              exit 0
-            fi
-            echo "Failed to publish $PACKAGE_NAME@$PACKAGE_VERSION to npmjs" >&2
-            exit 1
-          }
-        continue-on-error: true
+        id: npmjs
+        uses: dytsou/release/npm-publish@2096b0a3163d8d77127c0e276fc1cda7da3c63e2 # v1.2.0 (@v1)
+        with:
+          npm-token: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish to GitHub Packages
-        if: ${{ steps.check-github.outputs.exists == 'false' }}
-        id: publish-github
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGE_NAME: ${{ steps.package-name.outputs.name }}
-          PACKAGE_SCOPE: ${{ steps.package-name.outputs.scope }}
-          PACKAGE_VERSION: ${{ steps.package-version.outputs.version }}
-        run: |
-          set -euo pipefail
-          npm config set registry https://npm.pkg.github.com
-          npm config set "$PACKAGE_SCOPE:registry" https://npm.pkg.github.com
-          npm config set "//npm.pkg.github.com/:_authToken" "$NODE_AUTH_TOKEN"
-          pnpm publish --no-git-checks --registry=https://npm.pkg.github.com || {
-            if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version --registry=https://npm.pkg.github.com >/dev/null 2>&1; then
-              echo "Version already exists on GitHub Packages, skipping duplicate publish"
-              exit 0
-            fi
-            echo "Failed to publish $PACKAGE_NAME@$PACKAGE_VERSION to GitHub Packages" >&2
-            exit 1
-          }
-        continue-on-error: true
-
-      - name: Check if release should be created
-        id: should-create-release
-        env:
-          NPMJS_EXISTS: ${{ steps.check-npmjs.outputs.exists }}
-          NPMJS_PUBLISH_OUTCOME: ${{ steps.publish-npmjs.outcome }}
-          GITHUB_EXISTS: ${{ steps.check-github.outputs.exists }}
-          GITHUB_PUBLISH_OUTCOME: ${{ steps.publish-github.outcome }}
-        run: |
-          NPMJS_READY=false
-          GITHUB_READY=false
-          NEW_PUBLICATION=false
-
-          if [ "$NPMJS_EXISTS" = "true" ] || [ "$NPMJS_PUBLISH_OUTCOME" = "success" ]; then
-            NPMJS_READY=true
-          fi
-          if [ "$GITHUB_EXISTS" = "true" ] || [ "$GITHUB_PUBLISH_OUTCOME" = "success" ]; then
-            GITHUB_READY=true
-          fi
-          if [ "$NPMJS_PUBLISH_OUTCOME" = "success" ] || [ "$GITHUB_PUBLISH_OUTCOME" = "success" ]; then
-            NEW_PUBLICATION=true
-          fi
-
-          if [ "$NPMJS_READY" = "true" ] && [ "$GITHUB_READY" = "true" ] && [ "$NEW_PUBLICATION" = "true" ]; then
-            echo "should_create=true" >> "$GITHUB_OUTPUT"
-            echo "Version is available on both registries: npmjs=$NPMJS_READY, GitHub Packages=$GITHUB_READY"
-          else
-            echo "should_create=false" >> "$GITHUB_OUTPUT"
-            echo "No new registry publication; skipping GitHub Release creation"
-          fi
-
-      - name: Create GitHub Release
-        if: ${{ steps.should-create-release.outputs.should_create == 'true' }}
-        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        id: ghpkg
+        uses: dytsou/release/github-packages@2096b0a3163d8d77127c0e276fc1cda7da3c63e2 # v1.2.0 (@v1)
         with:
-          tag_name: v${{ steps.package-version.outputs.version }}
-          name: v${{ steps.package-version.outputs.version }}
-          prerelease: ${{ contains(steps.package-version.outputs.version, 'beta') || contains(steps.package-version.outputs.version, 'alpha') || contains(steps.package-version.outputs.version, 'rc') }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Skip reinstall when npmjs already installed deps in this job.
+          install-deps:
+            ${{ steps.npmjs.outputs.published == 'true' && 'false' || 'true' }}
+          verify-pack:
+            ${{ steps.npmjs.outputs.published == 'true' && 'false' || 'true' }}
+
+      - name: GitHub Release
+        if:
+          steps.npmjs.outputs.published == 'true' ||
+          steps.ghpkg.outputs.published == 'true'
+        uses: dytsou/release/github@2096b0a3163d8d77127c0e276fc1cda7da3c63e2 # v1.2.0 (@v1)
+        with:
+          from-package-json: "true"
+          move-major-tag: "false"
           body: |
-            ## ${{ steps.package-name.outputs.name }}@${{ steps.package-version.outputs.version }}
+            ## ${{ steps.npmjs.outputs.name }}@${{ steps.npmjs.outputs.version }}
 
-            Published to npmjs and GitHub Packages when this version was not already present.
+            **Published to multiple registries:**
 
-            - npmjs: https://www.npmjs.com/package/${{ steps.package-name.outputs.name }}
-            - GitHub Packages: https://github.com/dytsou/intern-corner-scheduler/packages
+            - **npmjs.com**: https://www.npmjs.com/package/${{ steps.npmjs.outputs.name }}
 
-            Install from npmjs:
+            - **GitHub Packages**: https://github.com/${{ github.repository }}/packages
+
+            *Note: If a registry already had this version, it was skipped. Only missing registries were published.*
+
+            ### Installation
+
+            **From npmjs (default):**
 
             ```bash
-            npm install ${{ steps.package-name.outputs.name }}
+            npm install ${{ steps.npmjs.outputs.name }}
+
             # or
-            pnpm add ${{ steps.package-name.outputs.name }}
+
+            pnpm install ${{ steps.npmjs.outputs.name }}
             ```
-          generate_release_notes: true
-          draft: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            **From GitHub Packages:**
+
+            First, create or update your `.npmrc` file:
+
+            ```ini
+            @dytsou:registry=https://npm.pkg.github.com
+            //npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
+            ```
+
+            Then install:
+
+            ```bash
+            npm install ${{ steps.npmjs.outputs.name }}
+
+            # or
+
+            pnpm install ${{ steps.npmjs.outputs.name }}
+            ```
 
       - name: Publish summary
         if: always()
-        env:
-          NPMJS_EXISTS: ${{ steps.check-npmjs.outputs.exists }}
-          NPMJS_PUBLISH_OUTCOME: ${{ steps.publish-npmjs.outcome }}
-          GITHUB_EXISTS: ${{ steps.check-github.outputs.exists }}
-          GITHUB_PUBLISH_OUTCOME: ${{ steps.publish-github.outcome }}
         run: |
           echo "## Publish Summary"
           echo "### npmjs"
-          if [ "$NPMJS_EXISTS" = "true" ]; then
+          if [ "${{ steps.npmjs.outputs.skipped }}" == "true" ]; then
             echo "Skipped - version already exists"
-          elif [ "$NPMJS_PUBLISH_OUTCOME" = "success" ]; then
+          elif [ "${{ steps.npmjs.outputs.published }}" == "true" ]; then
             echo "Published successfully"
-          elif [ "$NPMJS_PUBLISH_OUTCOME" = "failure" ]; then
-            echo "Failed to publish"
           else
-            echo "Not attempted"
+            echo "Not published"
           fi
+          echo ""
           echo "### GitHub Packages"
-          if [ "$GITHUB_EXISTS" = "true" ]; then
+          if [ "${{ steps.ghpkg.outputs.skipped }}" == "true" ]; then
             echo "Skipped - version already exists"
-          elif [ "$GITHUB_PUBLISH_OUTCOME" = "success" ]; then
+          elif [ "${{ steps.ghpkg.outputs.published }}" == "true" ]; then
             echo "Published successfully"
-          elif [ "$GITHUB_PUBLISH_OUTCOME" = "failure" ]; then
-            echo "Failed to publish"
           else
-            echo "Not attempted"
+            echo "Not published"
           fi
-
-      - name: Fail if either registry publish failed
-        if: ${{ steps.publish-npmjs.outcome == 'failure' || steps.publish-github.outcome == 'failure' }}
-        run: exit 1
