@@ -61,18 +61,6 @@
     "protobufjs": "8.8.1",
     "vite": "^8.2.1"
   },
-  "pnpm": {
-    "overrides": {
-      "@babel/core": "7.29.6",
-      "brace-expansion@1": "1.1.18",
-      "baseline-browser-mapping": "2.11.0",
-      "browserslist": "4.28.7",
-      "js-yaml": "4.3.2"
-    },
-    "patchedDependencies": {
-      "or-tools-wasm@0.9.1": "patches/or-tools-wasm@0.9.1.patch"
-    }
-  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
