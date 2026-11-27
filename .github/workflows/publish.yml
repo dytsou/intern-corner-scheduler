@@ -39,9 +39,7 @@ jobs:
 
       - name: Publish to npmjs
         id: npmjs
-        uses: dytsou/release/npm-publish@98055479dc1f0015d278ecd26b54ec6897d85eed # v1.3.5 (@v1)
-        with:
-          npm-token: ${{ secrets.NPM_TOKEN }}
+        uses: dytsou/release/npm-publish@2cd0db49a208aa8c039390cfc94f9ca8222ff86e # v1.4.1
 
       - name: Publish to GitHub Packages
         id: ghpkg
