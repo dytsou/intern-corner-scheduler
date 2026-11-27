@@ -60,9 +60,5 @@
     "prettier": "^3.7.4",
     "protobufjs": "8.8.1",
     "vite": "^8.2.1"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
   }
 }

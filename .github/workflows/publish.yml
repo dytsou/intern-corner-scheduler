@@ -43,12 +43,6 @@ jobs:
         id: npmjs
         uses: dytsou/release/npm-publish@2cd0db49a208aa8c039390cfc94f9ca8222ff86e # v1.4.1
 
-      - name: Select GitHub Packages metadata
-        shell: bash
-        run: |
-          # package.json publishConfig pins the npmjs registry. Remove it so this step publishes to GitHub Packages.
-          npm pkg delete publishConfig
-
       - name: Publish to GitHub Packages
         id: ghpkg
         uses: dytsou/release/github-packages@2cd0db49a208aa8c039390cfc94f9ca8222ff86e # v1.4.1
