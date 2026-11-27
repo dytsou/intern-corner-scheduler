@@ -22,6 +22,8 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Must match the environment name in the npm Trusted Publisher configuration.
+    environment: npm
     permissions:
       contents: write
       packages: write
